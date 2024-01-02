@@ -47,19 +47,42 @@ nextMonthBtn.addEventListener("click", showNextMonth);
 monthDropdown.addEventListener("change", showSelectedMonth);
 yearDropdown.addEventListener("change", showSelectedYear);
 
+function updateDateHeading() {
+  const currentDate = new Date();
+  const dayOfWeek = new Intl.DateTimeFormat('en-US', { weekday: 'short' }).format(currentDate);
+  const day = currentDate.getDate();
+  const month = new Intl.DateTimeFormat('en-US', { month: 'short' }).format(currentDate);
+  const year = currentDate.getFullYear();
+
+  const formattedDate = `${dayOfWeek} ${day} ${month} ${year}`;
+  fullDateEl.innerText = formattedDate;
+}
+
 // Initial rendering
 renderCalendar();
+updateDateHeading();
+// ... existing code ...
 
 function renderCalendar() {
   const selectedMonth = parseInt(monthDropdown.value);
   const selectedYear = parseInt(yearDropdown.value);
 
-  const monthInx = selectedMonth;
-  const lastDay = new Date(selectedYear, monthInx + 1, 0).getDate();
-  const firstDay = new Date(selectedYear, monthInx, 1).getDay() - 1;
+  const monthIndex = selectedMonth;
+  const lastDay = new Date(selectedYear, monthIndex + 1, 0).getDate();
+  const firstDay = new Date(selectedYear, monthIndex, 1).getDay() - 1;
 
-  monthEl.innerText = months[monthInx];
-  fullDateEl.innerText = new Date(selectedYear, monthInx).toDateString();
+  const monthName = months[monthIndex];
+
+  // Update the heading with the current date
+  const currentDateHeading = new Date(selectedYear, monthIndex).toLocaleDateString('en-US', {
+    weekday: 'short',
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+  });
+
+  monthEl.innerText = monthName;
+  fullDateEl.innerText = currentDateHeading;
 
   let days = "";
 
@@ -70,7 +93,7 @@ function renderCalendar() {
   for (let i = 1; i <= lastDay; i++) {
     if (
       i === currentDate.getDate() &&
-      monthInx === currentDate.getMonth() &&
+      monthIndex === currentDate.getMonth() &&
       selectedYear === currentDate.getFullYear()
     ) {
       days += `<div class="today">${i}</div>`;
@@ -81,6 +104,8 @@ function renderCalendar() {
 
   daysEl.innerHTML = days;
 }
+
+// ... existing code ...
 
 function showPreviousMonth() {
   const currentMonth = parseInt(monthDropdown.value);
@@ -101,3 +126,5 @@ function showSelectedMonth() {
 function showSelectedYear() {
   renderCalendar();
 }
+
+setInterval(updateDateHeading, 24 * 60 * 60 * 1000); // Update every 24 hours
